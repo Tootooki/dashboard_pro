@@ -39,6 +39,10 @@ function App() {
   const [permissionGranted, setPermissionGranted] = useState(false)
   const [status, setStatus] = useState('Online')
   const [lastAction, setLastAction] = useState('Ready')
+  const [currentTask, setCurrentTask] = useState(null)
+  const [taskProgress, setTaskProgress] = useState(0)
+  const [taskMessage, setTaskMessage] = useState('')
+  const [taskResult, setTaskResult] = useState('')
 
   // Load configuration on mount
   useEffect(() => {
@@ -172,12 +176,50 @@ function App() {
   }
 
   const triggerTask = async (taskName) => {
-    setLastAction(`Running: ${taskName}...`)
+    setLastAction(`Requesting: ${taskName}...`)
+    setTaskProgress(0)
+    setTaskMessage('Starting...')
+    setTaskResult('')
+
     try {
       const res = await fetch(`https://dashboard-pro-2464.onrender.com/api/run-task/${taskName}`, { method: 'POST' })
-      if (res.ok) setLastAction(`Task completed: ${taskName} ✅`)
+      const data = await res.json()
+
+      if (data.task_id) {
+        setLastAction(`Task ${taskName} is running...`)
+        setCurrentTask(data.task_id)
+
+        // Start Polling
+        const pollInterval = setInterval(async () => {
+          try {
+            const statusRes = await fetch(`https://dashboard-pro-2464.onrender.com/api/task-status/${data.task_id}`)
+            const statusData = await statusRes.json()
+
+            if (statusData.status === 'completed') {
+              clearInterval(pollInterval)
+              setCurrentTask(null)
+              setTaskProgress(100)
+              setTaskMessage(statusData.message)
+              setLastAction(`${taskName} Success! ✅`)
+              setTaskResult(statusData.message)
+            } else if (statusData.status === 'failed') {
+              clearInterval(pollInterval)
+              setCurrentTask(null)
+              setTaskMessage(`Error: ${statusData.message}`)
+              setLastAction(`Task failed ❌`)
+            } else {
+              setTaskProgress(statusData.progress || 10)
+              setTaskMessage(statusData.message)
+            }
+          } catch (e) {
+            console.error('Polling error:', e)
+          }
+        }, 2000)
+      } else {
+        setLastAction(`Task failed to start ❌`)
+      }
     } catch (err) {
-      setLastAction(`Task failed: ${taskName} ❌`)
+      setLastAction(`Connection error ❌`)
     }
   }
 
@@ -195,6 +237,25 @@ function App() {
           </div>
         </div>
       </header>
+
+      <div className="status-badges-container" style={{ padding: '0 5%' }}>
+        {currentTask && (
+          <div className="card task-status-card" style={{ marginBottom: '1.5rem', border: '1px solid var(--primary-color)' }}>
+            <h3>⚡ Running Task: {currentTask.split('_')[0]}</h3>
+            <div className="progress-container" style={{ height: '8px', background: '#333', borderRadius: '4px', overflow: 'hidden', margin: '1rem 0' }}>
+              <div className="progress-bar" style={{ width: `${taskProgress}%`, height: '100%', background: 'var(--primary-color)', transition: 'width 0.4s ease' }}></div>
+            </div>
+            <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>{taskMessage}</p>
+          </div>
+        )}
+
+        {taskResult && (
+          <div className="card task-result-card" style={{ marginBottom: '1.5rem', border: '1px solid #1a1a1a', background: '#0a0a0a' }}>
+            <h3>🏁 Task Results</h3>
+            <p style={{ margin: '1rem 0', color: '#ffffff' }}>{taskResult}</p>
+          </div>
+        )}
+      </div>
 
       <div className="permission-banner">
         <label className="checkbox-wrapper">
