@@ -72,7 +72,7 @@ function App() {
     lines.forEach(line => {
       const parts = line.split(':')
       if (parts.length >= 2) {
-        const key = parts[0].trim().toLowerCase()
+        const cleanKey = parts[0].trim().replace(/^[^\w]+/, '').toLowerCase()
         const value = parts.slice(1).join(':').trim()
 
         // Map keys to config properties
@@ -103,8 +103,8 @@ function App() {
           'notification_preference': 'notification_preference',
         }
 
-        if (mapping[key]) {
-          newConfig[mapping[key]] = value
+        if (mapping[cleanKey]) {
+          newConfig[mapping[cleanKey]] = value
           importedCount++
         }
       }
@@ -120,29 +120,29 @@ function App() {
   }
 
   const downloadTemplate = () => {
-    const template = `AMAZON_SP_CLIENT_ID: ${config.amazon_sp_client_id || 'enter_value'}
-AMAZON_SP_CLIENT_SECRET: ${config.amazon_sp_client_secret || 'enter_value'}
-AMAZON_SP_REFRESH_TOKEN: ${config.amazon_sp_refresh_token || 'enter_value'}
-AMAZON_SP_AWS_ACCESS_KEY: ${config.amazon_sp_aws_access_key || 'enter_value'}
-AMAZON_SP_AWS_SECRET_KEY: ${config.amazon_sp_aws_secret_key || 'enter_value'}
-AMAZON_SP_ROLE_ARN: ${config.amazon_sp_role_arn || 'enter_value'}
-AMAZON_ADS_CLIENT_ID: ${config.amazon_ads_client_id || 'enter_value'}
-AMAZON_ADS_CLIENT_SECRET: ${config.amazon_ads_client_secret || 'enter_value'}
-AMAZON_ADS_REFRESH_TOKEN: ${config.amazon_ads_refresh_token || 'enter_value'}
-AMAZON_ADS_PROFILE_ID: ${config.amazon_ads_profile_id || 'enter_value'}
-GOOGLE_SHEET_API: ${config.google_sheet_api || 'enter_value'}
-GOOGLE_DRIVE_API: ${config.google_drive_api || 'enter_value'}
-GOOGLE_SHEET_LINK: ${config.google_sheet_link || 'enter_value'}
-GOOGLE_DRIVE_LINK: ${config.google_drive_link || 'enter_value'}
-SLACK_API: ${config.slack_api || 'enter_value'}
-TELEGRAM_API: ${config.telegram_api || 'enter_value'}
-WHATSAPP_API: ${config.whatsapp_api || 'enter_value'}
-WALMART_API: ${config.walmart_api || 'enter_value'}
-TIKTOK_STORE_API: ${config.tiktok_store_api || 'enter_value'}
-TIKTOK_POSTING_API: ${config.tiktok_posting_api || 'enter_value'}
-GMAIL_API: ${config.gmail_api || 'enter_value'}
-SLACK_CHANNEL_ID: ${config.slack_channel_id || 'enter_value'}
-NOTIFICATION_PREFERENCE: ${config.notification_preference || 'telegram'}`
+    const template = `✅AMAZON_SP_CLIENT_ID: ${config.amazon_sp_client_id || 'enter_value'}
+✅AMAZON_SP_CLIENT_SECRET: ${config.amazon_sp_client_secret || 'enter_value'}
+✅AMAZON_SP_REFRESH_TOKEN: ${config.amazon_sp_refresh_token || 'enter_value'}
+✅AMAZON_SP_AWS_ACCESS_KEY: ${config.amazon_sp_aws_access_key || 'enter_value'}
+✅AMAZON_SP_AWS_SECRET_KEY: ${config.amazon_sp_aws_secret_key || 'enter_value'}
+✅AMAZON_SP_ROLE_ARN: ${config.amazon_sp_role_arn || 'enter_value'}
+✅AMAZON_ADS_CLIENT_ID: ${config.amazon_ads_client_id || 'enter_value'}
+✅AMAZON_ADS_CLIENT_SECRET: ${config.amazon_ads_client_secret || 'enter_value'}
+✅AMAZON_ADS_REFRESH_TOKEN: ${config.amazon_ads_refresh_token || 'enter_value'}
+✅AMAZON_ADS_PROFILE_ID: ${config.amazon_ads_profile_id || 'enter_value'}
+✅GOOGLE_SHEET_API: ${config.google_sheet_api || 'enter_value'}
+✅GOOGLE_DRIVE_API: ${config.google_drive_api || 'enter_value'}
+✅GOOGLE_SHEET_LINK: ${config.google_sheet_link || 'enter_value'}
+✅GOOGLE_DRIVE_LINK: ${config.google_drive_link || 'enter_value'}
+✅SLACK_API: ${config.slack_api || 'enter_value'}
+✅TELEGRAM_API: ${config.telegram_api || 'enter_value'}
+✅WHATSAPP_API: ${config.whatsapp_api || 'enter_value'}
+✅WALMART_API: ${config.walmart_api || 'enter_value'}
+✅TIKTOK_STORE_API: ${config.tiktok_store_api || 'enter_value'}
+✅TIKTOK_POSTING_API: ${config.tiktok_posting_api || 'enter_value'}
+✅GMAIL_API: ${config.gmail_api || 'enter_value'}
+✅SLACK_CHANNEL_ID: ${config.slack_channel_id || 'enter_value'}
+✅NOTIFICATION_PREFERENCE: ${config.notification_preference || 'telegram'}`
 
     const blob = new Blob([template], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
@@ -216,110 +216,110 @@ NOTIFICATION_PREFERENCE: ${config.notification_preference || 'telegram'}`
             <div className="grid grid-2">
               {/* === AMAZON SP API SECTION === */}
               <div className="section-divider" style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-                <h3 style={{ fontSize: '1.1rem', color: '#ffffff', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Amazon SP API Credentials</h3>
+                <h3 style={{ fontSize: '1.1rem', color: '#ffffff', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>✅ Amazon SP API Credentials</h3>
               </div>
               <div className="form-group">
-                <label>SP API CLIENT ID</label>
+                <label>✅ AMAZON SP CLIENT ID</label>
                 <input type="text" className="input-field" name="amazon_sp_client_id" value={config.amazon_sp_client_id} onChange={handleInputChange} placeholder="Client ID" />
               </div>
               <div className="form-group">
-                <label>SP API CLIENT SECRET</label>
+                <label>✅ AMAZON SP CLIENT SECRET</label>
                 <input type="password" className="input-field" name="amazon_sp_client_secret" value={config.amazon_sp_client_secret} onChange={handleInputChange} placeholder="Client Secret" />
               </div>
               <div className="form-group">
-                <label>SP API REFRESH TOKEN</label>
+                <label>✅ AMAZON SP REFRESH TOKEN</label>
                 <input type="text" className="input-field" name="amazon_sp_refresh_token" value={config.amazon_sp_refresh_token} onChange={handleInputChange} placeholder="Refresh Token" />
               </div>
               <div className="form-group">
-                <label>AWS ACCESS KEY</label>
+                <label>✅ AMAZON SP AWS ACCESS KEY</label>
                 <input type="password" className="input-field" name="amazon_sp_aws_access_key" value={config.amazon_sp_aws_access_key} onChange={handleInputChange} placeholder="AWS IAM Access Key" />
               </div>
               <div className="form-group">
-                <label>AWS SECRET KEY</label>
+                <label>✅ AMAZON SP AWS SECRET KEY</label>
                 <input type="password" className="input-field" name="amazon_sp_aws_secret_key" value={config.amazon_sp_aws_secret_key} onChange={handleInputChange} placeholder="AWS IAM Secret Key" />
               </div>
               <div className="form-group">
-                <label>AWS ROLE ARN</label>
+                <label>✅ AMAZON SP ROLE ARN</label>
                 <input type="text" className="input-field" name="amazon_sp_role_arn" value={config.amazon_sp_role_arn} onChange={handleInputChange} placeholder="arn:aws:iam::..." />
               </div>
 
               {/* === AMAZON ADS API SECTION === */}
               <div className="section-divider" style={{ gridColumn: '1 / -1', marginTop: '2rem' }}>
-                <h3 style={{ fontSize: '1.1rem', color: '#ffffff', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Amazon Ads API Credentials</h3>
+                <h3 style={{ fontSize: '1.1rem', color: '#ffffff', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>✅ Amazon Ads API Credentials</h3>
               </div>
               <div className="form-group">
-                <label>ADS API CLIENT ID</label>
+                <label>✅ AMAZON ADS CLIENT ID</label>
                 <input type="text" className="input-field" name="amazon_ads_client_id" value={config.amazon_ads_client_id} onChange={handleInputChange} placeholder="Client ID" />
               </div>
               <div className="form-group">
-                <label>ADS API CLIENT SECRET</label>
+                <label>✅ AMAZON ADS CLIENT SECRET</label>
                 <input type="password" className="input-field" name="amazon_ads_client_secret" value={config.amazon_ads_client_secret} onChange={handleInputChange} placeholder="Client Secret" />
               </div>
               <div className="form-group">
-                <label>ADS API REFRESH TOKEN</label>
+                <label>✅ AMAZON ADS REFRESH TOKEN</label>
                 <input type="text" className="input-field" name="amazon_ads_refresh_token" value={config.amazon_ads_refresh_token} onChange={handleInputChange} placeholder="Refresh Token" />
               </div>
               <div className="form-group">
-                <label>ADS PROFILE ID (US Market)</label>
+                <label>✅ AMAZON ADS PROFILE ID</label>
                 <input type="text" className="input-field" name="amazon_ads_profile_id" value={config.amazon_ads_profile_id} onChange={handleInputChange} placeholder="Profile ID" />
               </div>
 
               {/* === OTHER APIS SECTION === */}
               <div className="section-divider" style={{ gridColumn: '1 / -1', marginTop: '2rem' }}>
-                <h3 style={{ fontSize: '1.1rem', color: '#ffffff', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Other API Settings</h3>
+                <h3 style={{ fontSize: '1.1rem', color: '#ffffff', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>✅ Other API Settings</h3>
               </div>
               <div className="form-group">
-                <label>GOOGLE SHEET API</label>
+                <label>✅ GOOGLE SHEET API</label>
                 <input type="text" className="input-field" name="google_sheet_api" value={config.google_sheet_api} onChange={handleInputChange} placeholder="Enter Sheet API" />
               </div>
               <div className="form-group">
-                <label>GOOGLE DRIVE API</label>
+                <label>✅ GOOGLE DRIVE API</label>
                 <input type="text" className="input-field" name="google_drive_api" value={config.google_drive_api} onChange={handleInputChange} placeholder="Enter Drive API" />
               </div>
               <div className="form-group">
-                <label>GOOGLE SHEET LINK</label>
+                <label>✅ GOOGLE SHEET LINK</label>
                 <input type="text" className="input-field" name="google_sheet_link" value={config.google_sheet_link} onChange={handleInputChange} placeholder="https://..." />
               </div>
               <div className="form-group">
-                <label>GOOGLE DRIVE LINK</label>
+                <label>✅ GOOGLE DRIVE LINK</label>
                 <input type="text" className="input-field" name="google_drive_link" value={config.google_drive_link} onChange={handleInputChange} placeholder="https://..." />
               </div>
 
               <div className="form-group">
-                <label>GMAIL API</label>
+                <label>✅ GMAIL API</label>
                 <input type="text" className="input-field" name="gmail_api" value={config.gmail_api} onChange={handleInputChange} placeholder="Enter Gmail API" />
               </div>
               <div className="form-group">
-                <label>SLACK API</label>
+                <label>✅ SLACK API</label>
                 <input type="text" className="input-field" name="slack_api" value={config.slack_api} onChange={handleInputChange} placeholder="Enter Slack API" />
               </div>
               <div className="form-group">
-                <label>TELEGRAM API</label>
+                <label>✅ TELEGRAM API</label>
                 <input type="text" className="input-field" name="telegram_api" value={config.telegram_api} onChange={handleInputChange} placeholder="Enter Telegram API" />
               </div>
               <div className="form-group">
-                <label>WHATSAPP API</label>
+                <label>✅ WHATSAPP API</label>
                 <input type="text" className="input-field" name="whatsapp_api" value={config.whatsapp_api} onChange={handleInputChange} placeholder="Enter WhatsApp API" />
               </div>
               <div className="form-group">
-                <label>WALMART API</label>
+                <label>✅ WALMART API</label>
                 <input type="text" className="input-field" name="walmart_api" value={config.walmart_api} onChange={handleInputChange} placeholder="Enter Walmart API" />
               </div>
               <div className="form-group">
-                <label>TIKTOK STORE API</label>
+                <label>✅ TIKTOK STORE API</label>
                 <input type="text" className="input-field" name="tiktok_store_api" value={config.tiktok_store_api} onChange={handleInputChange} placeholder="Enter TikTok Store API" />
               </div>
               <div className="form-group">
-                <label>TIKTOK POSTING API</label>
+                <label>✅ TIKTOK POSTING API</label>
                 <input type="text" className="input-field" name="tiktok_posting_api" value={config.tiktok_posting_api} onChange={handleInputChange} placeholder="Enter TikTok Posting API" />
               </div>
               <div className="form-group">
-                <label>Slack Channel ID (for Report)</label>
+                <label>✅ Slack Channel ID (for Report)</label>
                 <input type="text" className="input-field" name="slack_channel_id" value={config.slack_channel_id} onChange={handleInputChange} placeholder="Enter Slack Channel ID" />
               </div>
 
               <div className="form-group">
-                <label>Notification Preference</label>
+                <label>✅ Notification Preference</label>
                 <select className="input-field" name="notification_preference" value={config.notification_preference} onChange={handleInputChange}>
                   <option value="telegram">Telegram Bot</option>
                   <option value="email">Gmail API (App Password)</option>
