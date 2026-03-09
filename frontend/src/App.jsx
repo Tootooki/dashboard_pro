@@ -31,6 +31,7 @@ function App() {
     gmail_api: '',
 
     // Automation Settings
+    service_account_email: '',
     slack_channel_id: '',
     notification_preference: 'telegram',
   })
@@ -48,7 +49,7 @@ function App() {
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const res = await fetch('https://dashboard-pro-2464.onrender.com/api/load-config')
+        const res = await fetch('https://dashboard-pro-rnm2.onrender.com/api/load-config')
         if (res.ok) {
           const data = await res.json()
           if (Object.keys(data).length > 0) {
@@ -103,6 +104,7 @@ function App() {
           'tiktok_store_api': 'tiktok_store_api',
           'tiktok_posting_api': 'tiktok_posting_api',
           'gmail_api': 'gmail_api',
+          'service_account_email': 'service_account_email',
           'slack_channel_id': 'slack_channel_id',
           'notification_preference': 'notification_preference',
         }
@@ -164,7 +166,7 @@ function App() {
     setLastAction('Saving configuration...')
     try {
       // Endpoint to save config
-      const res = await fetch('https://dashboard-pro-2464.onrender.com/api/save-config', {
+      const res = await fetch('https://dashboard-pro-rnm2.onrender.com/api/save-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(config)
@@ -182,7 +184,7 @@ function App() {
     setTaskResult('')
 
     try {
-      const res = await fetch(`https://dashboard-pro-2464.onrender.com/api/run-task/${taskName}`, { method: 'POST' })
+      const res = await fetch(`https://dashboard-pro-rnm2.onrender.com/api/run-task/${taskName}`, { method: 'POST' })
       const data = await res.json()
 
       if (data.task_id) {
@@ -192,7 +194,7 @@ function App() {
         // Start Polling
         const pollInterval = setInterval(async () => {
           try {
-            const statusRes = await fetch(`https://dashboard-pro-2464.onrender.com/api/task-status/${data.task_id}`)
+            const statusRes = await fetch(`https://dashboard-pro-rnm2.onrender.com/api/task-status/${data.task_id}`)
             const statusData = await statusRes.json()
 
             if (statusData.status === 'completed') {
@@ -373,6 +375,10 @@ function App() {
               <div className="form-group">
                 <label>✅ TIKTOK POSTING API</label>
                 <input type="text" className="input-field" name="tiktok_posting_api" value={config.tiktok_posting_api} onChange={handleInputChange} placeholder="Enter TikTok Posting API" />
+              </div>
+              <div className="form-group">
+                <label>✅ SERVICE ACCOUNT EMAIL</label>
+                <input type="text" className="input-field" name="service_account_email" value={config.service_account_email} onChange={handleInputChange} placeholder="Enter SA Email" />
               </div>
               <div className="form-group">
                 <label>✅ Slack Channel ID (for Report)</label>
