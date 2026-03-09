@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 function App() {
@@ -31,13 +31,120 @@ function App() {
     gmail_api: '',
   })
 
+  const [bulkText, setBulkText] = useState('')
   const [permissionGranted, setPermissionGranted] = useState(false)
   const [status, setStatus] = useState('Online')
   const [lastAction, setLastAction] = useState('Ready')
 
+  // Load configuration on mount
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch('https://dashboard-pro-2464.onrender.com/api/load-config')
+        if (res.ok) {
+          const data = await res.json()
+          if (Object.keys(data).length > 0) {
+            setConfig(prev => ({ ...prev, ...data }))
+            setLastAction('Configuration loaded ✅')
+          }
+        }
+      } catch (err) {
+        setLastAction('Error loading configuration ❌')
+      }
+    }
+    fetchConfig()
+  }, [])
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setConfig(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleBulkImport = () => {
+    const lines = bulkText.split('\n')
+    const newConfig = { ...config }
+    let importedCount = 0
+
+    lines.forEach(line => {
+      const parts = line.split(':')
+      if (parts.length >= 2) {
+        const key = parts[0].trim().toLowerCase()
+        const value = parts.slice(1).join(':').trim()
+
+        // Map keys to config properties
+        const mapping = {
+          'amazon_sp_client_id': 'amazon_sp_client_id',
+          'amazon_sp_client_secret': 'amazon_sp_client_secret',
+          'amazon_sp_refresh_token': 'amazon_sp_refresh_token',
+          'amazon_sp_aws_access_key': 'amazon_sp_aws_access_key',
+          'amazon_sp_aws_secret_key': 'amazon_sp_aws_secret_key',
+          'amazon_sp_role_arn': 'amazon_sp_role_arn',
+          'amazon_ads_client_id': 'amazon_ads_client_id',
+          'amazon_ads_client_secret': 'amazon_ads_client_secret',
+          'amazon_ads_refresh_token': 'amazon_ads_refresh_token',
+          'amazon_ads_profile_id': 'amazon_ads_profile_id',
+          'amazon_ads_profile_id_us': 'amazon_ads_profile_id',
+          'google_sheet_api': 'google_sheet_api',
+          'google_drive_api': 'google_drive_api',
+          'google_sheet_link': 'google_sheet_link',
+          'google_drive_link': 'google_drive_link',
+          'slack_api': 'slack_api',
+          'telegram_api': 'telegram_api',
+          'whatsapp_api': 'whatsapp_api',
+          'walmart_api': 'walmart_api',
+          'tiktok_store_api': 'tiktok_store_api',
+          'tiktok_posting_api': 'tiktok_posting_api',
+          'gmail_api': 'gmail_api'
+        }
+
+        if (mapping[key]) {
+          newConfig[mapping[key]] = value
+          importedCount++
+        }
+      }
+    })
+
+    if (importedCount > 0) {
+      setConfig(newConfig)
+      setLastAction(`Imported ${importedCount} fields successfully ✅`)
+      setBulkText('')
+    } else {
+      setLastAction('No valid fields found in import text ❌')
+    }
+  }
+
+  const downloadTemplate = () => {
+    const template = `AMAZON_SP_CLIENT_ID: ${config.amazon_sp_client_id || 'enter_value'}
+AMAZON_SP_CLIENT_SECRET: ${config.amazon_sp_client_secret || 'enter_value'}
+AMAZON_SP_REFRESH_TOKEN: ${config.amazon_sp_refresh_token || 'enter_value'}
+AMAZON_SP_AWS_ACCESS_KEY: ${config.amazon_sp_aws_access_key || 'enter_value'}
+AMAZON_SP_AWS_SECRET_KEY: ${config.amazon_sp_aws_secret_key || 'enter_value'}
+AMAZON_SP_ROLE_ARN: ${config.amazon_sp_role_arn || 'enter_value'}
+AMAZON_ADS_CLIENT_ID: ${config.amazon_ads_client_id || 'enter_value'}
+AMAZON_ADS_CLIENT_SECRET: ${config.amazon_ads_client_secret || 'enter_value'}
+AMAZON_ADS_REFRESH_TOKEN: ${config.amazon_ads_refresh_token || 'enter_value'}
+AMAZON_ADS_PROFILE_ID: ${config.amazon_ads_profile_id || 'enter_value'}
+GOOGLE_SHEET_API: ${config.google_sheet_api || 'enter_value'}
+GOOGLE_DRIVE_API: ${config.google_drive_api || 'enter_value'}
+GOOGLE_SHEET_LINK: ${config.google_sheet_link || 'enter_value'}
+GOOGLE_DRIVE_LINK: ${config.google_drive_link || 'enter_value'}
+SLACK_API: ${config.slack_api || 'enter_value'}
+TELEGRAM_API: ${config.telegram_api || 'enter_value'}
+WHATSAPP_API: ${config.whatsapp_api || 'enter_value'}
+WALMART_API: ${config.walmart_api || 'enter_value'}
+TIKTOK_STORE_API: ${config.tiktok_store_api || 'enter_value'}
+TIKTOK_POSTING_API: ${config.tiktok_posting_api || 'enter_value'}
+GMAIL_API: ${config.gmail_api || 'enter_value'}`
+
+    const blob = new Blob([template], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'config_template.txt'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   const handleSaveConfig = async (e) => {
@@ -199,10 +306,28 @@ function App() {
                 <input type="text" className="input-field" name="tiktok_posting_api" value={config.tiktok_posting_api} onChange={handleInputChange} placeholder="Enter TikTok Posting API" />
               </div>
             </div>
-            <div className="save-btn-container">
+            <div className="save-btn-container" style={{ gap: '1rem' }}>
+              <button type="button" className="btn btn-secondary" onClick={downloadTemplate}>Download Template</button>
               <button type="submit" className="btn btn-primary">Save Configuration</button>
             </div>
           </form>
+        </section>
+
+        <section className="card">
+          <h2>Bulk API Import</h2>
+          <p>Paste your <code>KEY: VALUE</code> block here to fill all fields instantly.</p>
+          <div className="form-group">
+            <textarea
+              className="input-field"
+              style={{ minHeight: '200px', fontFamily: 'monospace', resize: 'vertical' }}
+              value={bulkText}
+              onChange={(e) => setBulkText(e.target.value)}
+              placeholder={"AMAZON_SP_CLIENT_ID: your_id\nAMAZON_SP_CLIENT_SECRET: your_secret\n..."}
+            />
+          </div>
+          <div className="save-btn-container" style={{ marginTop: '1.5rem' }}>
+            <button className="btn btn-primary" onClick={handleBulkImport}>Import All Keys</button>
+          </div>
         </section>
 
         <section className="card">

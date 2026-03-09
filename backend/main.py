@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
+import json
+import os
+
+CONFIG_FILE = "config.json"
 
 app = FastAPI(title="aofaof.online API")
 
@@ -47,10 +51,17 @@ class ConfigData(BaseModel):
 def read_root():
     return {"status": "online"}
 
+@app.get("/api/load-config")
+def load_config():
+    if os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
 @app.post("/api/save-config")
 def save_config(config: ConfigData):
-    # In a real app this would save to a database or .env file
-    # For now, we will just echo success
+    with open(CONFIG_FILE, "w") as f:
+        json.dump(config.dict(), f)
     return {"message": "Configuration saved successfully"}
 
 @app.post("/api/run-task/{task_name}")
