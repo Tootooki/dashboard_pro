@@ -52,12 +52,12 @@ function App() {
   useEffect(() => {
     const init = async () => {
       try {
-        const pRes = await fetch('https://dashboard-pro-rnm2.onrender.com/api/list-presets')
+        const pRes = await fetch('https://dashboard-pro-2464.onrender.com/api/list-presets')
         if (pRes.ok) {
           const pList = await pRes.json()
           setPresets(pList)
         }
-        const res = await fetch('https://dashboard-pro-rnm2.onrender.com/api/load-config')
+        const res = await fetch('https://dashboard-pro-2464.onrender.com/api/load-config')
         if (res.ok) {
           const data = await res.json()
           if (Object.keys(data).length > 0) {
@@ -75,7 +75,7 @@ function App() {
   const handleLoadPreset = async (name) => {
     try {
       setCurrentPresetName(name)
-      const res = await fetch(`https://dashboard-pro-rnm2.onrender.com/api/load-config?preset=${name}`)
+      const res = await fetch(`https://dashboard-pro-2464.onrender.com/api/load-config?preset=${name}`)
       if (res.ok) {
         const data = await res.json()
         setConfig(data)
@@ -89,7 +89,7 @@ function App() {
   const handleSavePreset = async () => {
     const nameToSave = newPresetName.trim() || currentPresetName
     try {
-      const res = await fetch(`https://dashboard-pro-rnm2.onrender.com/api/save-config?preset=${nameToSave}`, {
+      const res = await fetch(`https://dashboard-pro-2464.onrender.com/api/save-config?preset=${nameToSave}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(config)
@@ -98,7 +98,7 @@ function App() {
         const data = await res.json()
         setLastAction(data.message)
         setNewPresetName('')
-        const pRes = await fetch('https://dashboard-pro-rnm2.onrender.com/api/list-presets')
+        const pRes = await fetch('https://dashboard-pro-2464.onrender.com/api/list-presets')
         if (pRes.ok) setPresets(await pRes.json())
         setCurrentPresetName(nameToSave)
       }
@@ -209,7 +209,7 @@ function App() {
     setLastAction('Saving configuration...')
     try {
       // Endpoint to save config
-      const res = await fetch('https://dashboard-pro-rnm2.onrender.com/api/save-config', {
+      const res = await fetch('https://dashboard-pro-2464.onrender.com/api/save-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(config)
@@ -227,7 +227,7 @@ function App() {
     setTaskResult('')
 
     try {
-      const res = await fetch(`https://dashboard-pro-rnm2.onrender.com/api/run-task/${taskName}`, { method: 'POST' })
+      const res = await fetch(`https://dashboard-pro-2464.onrender.com/api/run-task/${taskName}`, { method: 'POST' })
       const data = await res.json()
 
       if (data.task_id) {
@@ -237,7 +237,7 @@ function App() {
         // Start Polling
         const pollInterval = setInterval(async () => {
           try {
-            const statusRes = await fetch(`https://dashboard-pro-rnm2.onrender.com/api/task-status/${data.task_id}`)
+            const statusRes = await fetch(`https://dashboard-pro-2464.onrender.com/api/task-status/${data.task_id}`)
             const statusData = await statusRes.json()
 
             if (statusData.status === 'completed') {
