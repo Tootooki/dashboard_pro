@@ -44,11 +44,19 @@ function App() {
   const [taskProgress, setTaskProgress] = useState(0)
   const [taskMessage, setTaskMessage] = useState('')
   const [taskResult, setTaskResult] = useState('')
+  const [presets, setPresets] = useState(['default'])
+  const [currentPresetName, setCurrentPresetName] = useState('default')
+  const [newPresetName, setNewPresetName] = useState('')
 
-  // Load configuration on mount
+  // Load configuration and presets on mount
   useEffect(() => {
-    const fetchConfig = async () => {
+    const init = async () => {
       try {
+        const pRes = await fetch('https://dashboard-pro-rnm2.onrender.com/api/list-presets')
+        if (pRes.ok) {
+          const pList = await pRes.json()
+          setPresets(pList)
+        }
         const res = await fetch('https://dashboard-pro-rnm2.onrender.com/api/load-config')
         if (res.ok) {
           const data = await res.json()
@@ -58,11 +66,46 @@ function App() {
           }
         }
       } catch (err) {
-        setLastAction('Error loading configuration ❌')
+        setLastAction('Error loading system ❌')
       }
     }
-    fetchConfig()
+    init()
   }, [])
+
+  const handleLoadPreset = async (name) => {
+    try {
+      setCurrentPresetName(name)
+      const res = await fetch(`https://dashboard-pro-rnm2.onrender.com/api/load-config?preset=${name}`)
+      if (res.ok) {
+        const data = await res.json()
+        setConfig(data)
+        setLastAction(`Preset '${name}' loaded ✅`)
+      }
+    } catch (err) {
+      setLastAction(`Error loading preset '${name}' ❌`)
+    }
+  }
+
+  const handleSavePreset = async () => {
+    const nameToSave = newPresetName.trim() || currentPresetName
+    try {
+      const res = await fetch(`https://dashboard-pro-rnm2.onrender.com/api/save-config?preset=${nameToSave}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setLastAction(data.message)
+        setNewPresetName('')
+        const pRes = await fetch('https://dashboard-pro-rnm2.onrender.com/api/list-presets')
+        if (pRes.ok) setPresets(await pRes.json())
+        setCurrentPresetName(nameToSave)
+      }
+    } catch (err) {
+      setLastAction('Error saving preset ❌')
+    }
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -276,6 +319,41 @@ function App() {
         <section className="card">
           <h2>API Configuration</h2>
           <form onSubmit={handleSaveConfig}>
+            <div className="section-title">API CONFIGURATION</div>
+
+            {/* Preset Selector */}
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', alignItems: 'center' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '10px', color: '#888', display: 'block', marginBottom: '4px' }}>LOAD PRESET</label>
+                <select
+                  value={currentPresetName}
+                  onChange={(e) => handleLoadPreset(e.target.value)}
+                  style={{ width: '100%', background: '#111', color: 'white', border: '1px solid #333', borderRadius: '8px', padding: '8px' }}
+                >
+                  {presets.map(p => <option key={p} value={p}>{p.toUpperCase()}</option>)}
+                </select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '10px', color: '#888', display: 'block', marginBottom: '4px' }}>SAVE AS NEW PRESET</label>
+                <div style={{ display: 'flex', gap: '5px' }}>
+                  <input
+                    type="text"
+                    placeholder="Name..."
+                    value={newPresetName}
+                    onChange={(e) => setNewPresetName(e.target.value)}
+                    style={{ flex: 1, background: '#111', color: 'white', border: '1px solid #333', borderRadius: '8px', padding: '8px' }}
+                  />
+                  <button
+                    type="button" // Changed to type="button" to prevent form submission
+                    onClick={handleSavePreset}
+                    style={{ background: 'white', color: 'black', border: 'none', borderRadius: '8px', padding: '8px 12px', fontWeight: 'bold', cursor: 'pointer' }}
+                  >
+                    SAVE
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-2">
               {/* === AMAZON SP API SECTION === */}
               <div className="section-divider" style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>

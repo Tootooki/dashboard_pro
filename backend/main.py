@@ -70,11 +70,25 @@ def read_root():
     return {"status": "online"}
 
 @app.get("/api/load-config")
-def load_config():
+def load_config(preset: str = "default"):
     if os.path.exists(CONFIG_FILE):
         with open(CONFIG_FILE, "r") as f:
-            return json.load(f)
+            data = json.load(f)
+            presets = data.get("presets", {})
+            if preset in presets:
+                return presets[preset]
+            # Fallback to current if preset not found
+            current_name = data.get("current", "default")
+            return presets.get(current_name, {})
     return {}
+
+@app.get("/api/list-presets")
+def list_presets():
+    if os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, "r") as f:
+            data = json.load(f)
+            return list(data.get("presets", {}).keys())
+    return ["default"]
 
 def update_task(task_id: str, status: str, progress: int, message: str):
     tasks_status[task_id] = {
@@ -85,10 +99,21 @@ def update_task(task_id: str, status: str, progress: int, message: str):
     }
 
 @app.post("/api/save-config")
-def save_config(config: ConfigData):
+def save_config(config: ConfigData, preset: str = "default"):
+    data = {"current": preset, "presets": {}}
+    if os.path.exists(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE, "r") as f:
+                data = json.load(f)
+        except:
+            pass
+            
+    data["presets"][preset] = config.dict()
+    data["current"] = preset
+    
     with open(CONFIG_FILE, "w") as f:
-        json.dump(config.dict(), f)
-    return {"message": "Configuration saved successfully"}
+        json.dump(data, f)
+    return {"message": f"Configuration saved as preset '{preset}' ✅"}
 
 @app.get("/api/task-status/{task_id}")
 def get_task_status(task_id: str):
