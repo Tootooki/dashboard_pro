@@ -45,7 +45,7 @@ function App() {
     setLastAction('Saving configuration...')
     try {
       // Endpoint to save config
-      const res = await fetch('http://localhost:8000/api/save-config', {
+      const res = await fetch('https://dashboard-pro-2464.onrender.com/api/save-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(config)
@@ -59,7 +59,7 @@ function App() {
   const triggerTask = async (taskName) => {
     setLastAction(`Running: ${taskName}...`)
     try {
-      const res = await fetch(`http://localhost:8000/api/run-task/${taskName}`, { method: 'POST' })
+      const res = await fetch(`https://dashboard-pro-2464.onrender.com/api/run-task/${taskName}`, { method: 'POST' })
       if (res.ok) setLastAction(`Task completed: ${taskName} ✅`)
     } catch (err) {
       setLastAction(`Task failed: ${taskName} ❌`)
