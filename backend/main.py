@@ -45,6 +45,10 @@ class ConfigData(BaseModel):
     tiktok_store_api: str = ""
     tiktok_posting_api: str = ""
     gmail_api: str = ""
+    
+    # Automation Settings
+    slack_channel_id: str = ""
+    notification_preference: str = "telegram" # telegram or email
 
 
 @app.get("/")
@@ -66,12 +70,32 @@ def save_config(config: ConfigData):
 
 @app.post("/api/run-task/{task_name}")
 def run_task(task_name: str):
-    # Depending on task_name, run the specific python automation script
-    if task_name == "download_accounting_sheet":
-        # Here we would call the existing python scripts
-        pass
+    # Standardize names as requested (ALL CAPS)
+    task_key = task_name.upper()
     
-    return {"message": f"Task {task_name} started"}
+    if task_key == "ACCOUNTING":
+        # logic: 
+        # 1. Create Google Drive Folder (with Date/Name)
+        # 2. Create Google Sheet inside folder
+        # 3. Fetch Amazon SP + Ads Data (with refresh token handling)
+        # 4. Populate Sheet
+        return {"message": "ACCOUNTING task started: Creating sheet and syncing Amazon data..."}
+        
+    elif task_key == "SLACK_REPORT":
+        # logic:
+        # 1. Open Google Sheet
+        # 2. Capture Screenshot
+        # 3. Send to Slack Channel
+        return {"message": "SLACK_REPORT task started: Sending sheet screenshot to Slack..."}
+        
+    elif task_key == "AUTOMATION":
+        # logic:
+        # 1. Run ACCOUNTING
+        # 2. Run SLACK_REPORT
+        # 3. Send notification (every hour)
+        return {"message": "AUTOMATION task started: Running full hourly sync and notification..."}
+    
+    return {"message": f"Task {task_name} received"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

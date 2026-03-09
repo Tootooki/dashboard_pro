@@ -29,6 +29,10 @@ function App() {
     tiktok_store_api: '',
     tiktok_posting_api: '',
     gmail_api: '',
+
+    // Automation Settings
+    slack_channel_id: '',
+    notification_preference: 'telegram',
   })
 
   const [bulkText, setBulkText] = useState('')
@@ -94,7 +98,9 @@ function App() {
           'walmart_api': 'walmart_api',
           'tiktok_store_api': 'tiktok_store_api',
           'tiktok_posting_api': 'tiktok_posting_api',
-          'gmail_api': 'gmail_api'
+          'gmail_api': 'gmail_api',
+          'slack_channel_id': 'slack_channel_id',
+          'notification_preference': 'notification_preference',
         }
 
         if (mapping[key]) {
@@ -134,7 +140,9 @@ WHATSAPP_API: ${config.whatsapp_api || 'enter_value'}
 WALMART_API: ${config.walmart_api || 'enter_value'}
 TIKTOK_STORE_API: ${config.tiktok_store_api || 'enter_value'}
 TIKTOK_POSTING_API: ${config.tiktok_posting_api || 'enter_value'}
-GMAIL_API: ${config.gmail_api || 'enter_value'}`
+GMAIL_API: ${config.gmail_api || 'enter_value'}
+SLACK_CHANNEL_ID: ${config.slack_channel_id || 'enter_value'}
+NOTIFICATION_PREFERENCE: ${config.notification_preference || 'telegram'}`
 
     const blob = new Blob([template], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
@@ -305,6 +313,18 @@ GMAIL_API: ${config.gmail_api || 'enter_value'}`
                 <label>TIKTOK POSTING API</label>
                 <input type="text" className="input-field" name="tiktok_posting_api" value={config.tiktok_posting_api} onChange={handleInputChange} placeholder="Enter TikTok Posting API" />
               </div>
+              <div className="form-group">
+                <label>Slack Channel ID (for Report)</label>
+                <input type="text" className="input-field" name="slack_channel_id" value={config.slack_channel_id} onChange={handleInputChange} placeholder="Enter Slack Channel ID" />
+              </div>
+
+              <div className="form-group">
+                <label>Notification Preference</label>
+                <select className="input-field" name="notification_preference" value={config.notification_preference} onChange={handleInputChange}>
+                  <option value="telegram">Telegram Bot</option>
+                  <option value="email">Gmail API (App Password)</option>
+                </select>
+              </div>
             </div>
             <div className="save-btn-container" style={{ gap: '1rem' }}>
               <button type="button" className="btn btn-secondary" onClick={downloadTemplate}>Download Template</button>
@@ -333,13 +353,26 @@ GMAIL_API: ${config.gmail_api || 'enter_value'}`
         <section className="card">
           <h2>System Actions</h2>
           <div className="action-grid">
-            <button className="action-btn" onClick={() => triggerTask('download_accounting_sheet')}>
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-              Download ACCOUNTING Sheet
+            <button className="action-btn" onClick={() => triggerTask('ACCOUNTING')}>
+              <div className="action-icon">📊</div>
+              <div className="action-info">
+                <h3>ACCOUNTING</h3>
+                <p>Sync Amazon Data & Create Sheet</p>
+              </div>
             </button>
-            <button className="action-btn" onClick={() => triggerTask('sync_amazon_data')}>
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-              Sync Amazon Data
+            <button className="action-btn" onClick={() => triggerTask('SLACK_REPORT')}>
+              <div className="action-icon">💬</div>
+              <div className="action-info">
+                <h3>SLACK_REPORT</h3>
+                <p>Send Spreadsheet Screenshot</p>
+              </div>
+            </button>
+            <button className="action-btn" onClick={() => triggerTask('AUTOMATION')}>
+              <div className="action-icon">🤖</div>
+              <div className="action-info">
+                <h3>AUTOMATION</h3>
+                <p>Run ACCOUNTING + SLACK hourly</p>
+              </div>
             </button>
           </div>
         </section>
