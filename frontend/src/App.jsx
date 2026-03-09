@@ -184,7 +184,7 @@ NOTIFICATION_PREFERENCE: ${config.notification_preference || 'telegram'}`
   return (
     <div className="app-container">
       <header className="header">
-        <h1>PRO_API</h1>
+        <h1>✅ PRO_API</h1>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', alignItems: 'center', marginTop: '1rem' }}>
           <div className="status-badge">
             <span className="status-indicator"></span>
